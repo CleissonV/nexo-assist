@@ -46,7 +46,7 @@ const schema = z.object({
   os: z.string(),
   ticketId: z.string(),
 });
-type Understanding = z.infer<typeof schema>;
+type Understanding = z.infer<typeof schema> & { source?: "policy" };
 const normalize = (s: string) =>
   s
     .normalize("NFD")
@@ -133,7 +133,15 @@ async function understand(state: typeof State.State) {
   const { text, conversation: c } = state;
   let u = demo(text, c);
   if (c.pending || ["cancelar", "resolveu, obrigado"].includes(normalize(text)))
-    return { understanding: u };
+    return {
+      understanding: {
+        ...u,
+        source: "policy" as const,
+        confidence: 1,
+        reason:
+          "Comando explícito aplicado ao estado atual da conversa, sem necessidade de nova consulta ao modelo.",
+      },
+    };
   const settings = modelSettings();
   if (settings) {
     try {
@@ -189,9 +197,12 @@ async function understand(state: typeof State.State) {
 }
 async function act(state: typeof State.State) {
   const { text, conversation: c, understanding: u } = state;
-  const source = modelSettings()
-    ? "LLM + política do service desk"
-    : "Demonstração determinística";
+  const source =
+    u.source === "policy"
+      ? "Política determinística"
+      : modelSettings()
+        ? "LLM + política do service desk"
+        : "Demonstração determinística";
   const trace: Trace[] = [
     {
       action: "Entendeu sua solicitação",
@@ -462,7 +473,7 @@ async function act(state: typeof State.State) {
     operationId: randomUUID(),
     targetId: duplicate?.id,
     ticket: {
-      title: duplicate?.title || problem.slice(0, 100),
+      title: duplicate?.title || (u.title || problem).slice(0, 100),
       description: duplicate
         ? `${duplicate.description}\nComplemento: ${problem}`
         : `${problem}\nSistema: ${c.facts.os || "não informado"}\nUrgência: ${c.facts.urgency}`,

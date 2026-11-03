@@ -16,7 +16,12 @@ async function turn(c: Conversation, text: string) {
   });
   const m = await respond(c, text);
   c.messages.push(m);
-  assert.equal(m.trace?.[0].source, "LLM + política do service desk");
+  assert.equal(
+    m.trace?.[0].source,
+    text === "Confirmar"
+      ? "Política determinística"
+      : "LLM + política do service desk",
+  );
   assert.ok(
     m.trace![0].confidence >= 0.7,
     `Unexpected low confidence: ${m.trace?.[0].reason}`,

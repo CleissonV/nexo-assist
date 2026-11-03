@@ -477,7 +477,9 @@ export default function Home() {
                   {e.email}
                 </button>
               ))}
-              <small>Console: analista@nexo.com · senha local: nexo-demo</small>
+              <small>
+                Console: analista@nexo.com · consulte as credenciais da entrega.
+              </small>
             </div>
           </form>
           <footer>

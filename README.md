@@ -32,7 +32,7 @@ Configure `OPENAI_API_KEY` em `.env.local` para ativar a interpretação pelo mo
 
 Alternativa na Vercel: `AI_GATEWAY_ENABLED=true` usa o token OIDC de curta duração da plataforma; `AI_GATEWAY_MODEL=openai/gpt-4.1-mini`. A conta deve estar verificada e com acesso liberado ao Gateway. A autenticação foi testada, mas a conta retornou `customer_verification_required`; por isso a integração não é ativada silenciosamente. Localmente também é possível usar `AI_GATEWAY_API_KEY`.
 
-**Sem chave, a aplicação identifica claramente “Modo demonstração”.** Nesse modo o mesmo grafo LangGraph usa classificação determinística, suficiente para reproduzir os cenários de teste. Isso não substitui a avaliação com um LLM: a integração real depende de credenciais e não foi validada com um provedor nesta entrega inicial. Falha do provedor ou baixa confiança transferem para humano; não há execução silenciosa com uma decisão improvisada.
+**Sem chave, a aplicação identifica claramente “Modo demonstração”.** Nesse modo o mesmo grafo LangGraph usa classificação determinística para desenvolvimento. O deploy utiliza **Gemini real**, validado com cenários de dúvida, privacidade, triagem, prioridade, confirmação, escopo e transferência crítica. Falha do provedor ou baixa confiança transferem para humano; não há execução silenciosa com uma decisão improvisada.
 
 ## Arquitetura e decisões
 
@@ -72,6 +72,8 @@ npm run typecheck
 npm run build
 ```
 
+Avaliação opcional com um provedor real configurado em `.env.local`: `node --env-file=.env.local --import tsx tests/live-evaluation.ts`. Ela usa banco de teste separado e consome a cota do provedor. O teste integrado contra um servidor está em `tests/api-smoke.mjs`; configure `TEST_BASE_URL` e `TEST_ANALYST_PASSWORD` sem colocar a senha em argumentos de terminal.
+
 Testes exercitam classificação por impacto/urgência, fim de semana, fronteira de sete dias, isolamento por proprietário, tentativa de atualização indevida, confirmação sem duplicação, reabertura, transferência crítica/vencida/incerta, persistência do estado, aplicabilidade do artigo VPN e retries. Os testes usam banco separado em `work/`.
 
 Roteiro manual:
@@ -98,7 +100,7 @@ O backend não funciona em GitHub Pages, que hospeda arquivos estáticos. O proj
 4. Execute deploy. Esquema e dados de exemplo são inicializados automaticamente sem sobrescrever dados existentes.
 5. Teste o roteiro acima no endereço publicado. Compartilhe senha do analista diretamente com os avaliadores, nunca no repositório público.
 
-**Estado atual:** banco Neon conectado e validado; deploy provisório em validação. IA real depende de chave de provedor ou verificação do AI Gateway. O modo demonstração é identificado e não deve ser confundido com conformidade completa ao requisito de LLM do PRD.
+**Deploy público:** https://nexo-assist-zeta.vercel.app — Gemini real e banco Neon persistente. Chaves e senha do analista estão como segredos do servidor. A página de produção é pública; os endereços de versões e previews mantêm Standard Protection da Vercel. O teste integrado pela URL pública passou em privacidade, transferência, pausa, assumir atendimento, responder como analista, devolver ao agente, encerrar e progresso real.
 
 Documentação: [LangGraph](https://docs.langchain.com/oss/javascript/langgraph/graph-api), [Turso](https://docs.turso.tech/quickstart), [OpenAI](https://developers.openai.com/api/docs/quickstart).
 
