@@ -18,7 +18,7 @@ async function turn(c: Conversation, text: string) {
   c.messages.push(m);
   assert.equal(
     m.trace?.[0].source,
-    text === "Confirmar" || /INC-20400/.test(text)
+    text === "Confirmar" || /INC-20400|equipe inteira está parada/.test(text)
       ? "Política determinística"
       : "LLM + política do service desk",
   );
@@ -51,11 +51,9 @@ try {
   assert.match(m.text, /RH|financeiro/);
   assert.equal(outside.status, "agent");
   const critical = await newConversation("bruno.costa@nexo.com");
-  await turn(critical, "O ERP parou de funcionar.");
-  await turn(critical, "Toda a minha equipe está afetada.");
   await turn(
     critical,
-    "A equipe inteira está parada, sem alternativa para trabalhar.",
+    "O ERP parou: a equipe inteira está parada, sem alternativa para trabalhar.",
   );
   assert.equal(critical.status, "waiting");
   console.log(

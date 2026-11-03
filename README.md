@@ -24,7 +24,7 @@ Console: `analista@nexo.com`, senha local `nexo-demo`. Em produção, definir `A
 
 ## IA e modo demonstração
 
-**Opção sem compra de créditos:** configure `GEMINI_API_KEY` no arquivo `.env.local`, usando uma chave de projeto Google AI Studio na faixa gratuita. O modelo padrão é `gemini-3.1-flash-lite`, configurável por `GEMINI_MODEL`. O adaptador usa o endpoint de compatibilidade oficial do Gemini, sem alterar o grafo ou as regras. A faixa gratuita tem limites e pode ser insuficiente para alto volume; sua disponibilidade depende da conta. Não ative faturamento para testar sem custos. [Preços](https://ai.google.dev/gemini-api/docs/pricing) e [compatibilidade oficial](https://ai.google.dev/gemini-api/docs/openai).
+**Opção sem compra de créditos:** configure `GEMINI_API_KEY` no arquivo `.env.local`, usando uma chave de projeto Google AI Studio na faixa gratuita. O modelo padrão é `gemini-3.1-flash-lite`, configurável por `GEMINI_MODEL`. O adaptador usa a API nativa `generateContent`, com JSON Schema validado por Zod e nível mínimo de raciocínio. A faixa gratuita tem limites e pode ser insuficiente para alto volume; sua disponibilidade depende da conta. Não ative faturamento para testar sem custos. [Preços](https://ai.google.dev/gemini-api/docs/pricing).
 
 Ordem de seleção de credenciais: Gemini, OpenAI e Gateway explicitamente habilitado. Apenas o provedor selecionado recebe as mensagens.
 

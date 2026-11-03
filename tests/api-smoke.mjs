@@ -28,6 +28,7 @@ const path = "conversations/" + c.id;
 assert.equal((await api(path, bruno)).status, 404);
 let result = await api(path, ana, { text: "INC-20311" });
 assert.equal(result.data.status, "waiting");
+assert.equal(result.data.messages.at(-1).tickets?.[0]?.id, "INC-20311");
 assert.ok(result.data.summary);
 const assistantCount = result.data.messages.filter(
   (m) => m.role === "assistant",
@@ -74,6 +75,11 @@ const stream = await fetch(base + "conversations/" + s.id, {
 const events = (await stream.text()).trim().split("\n").map(JSON.parse);
 assert.equal(events.filter((e) => e.type === "progress").length, 3);
 assert.equal(events.at(-1).type, "result");
+assert.match(events.at(-1).data.messages.at(-1).text, /8h.*18h/);
+assert.equal(
+  events.at(-1).data.messages.at(-1).trace[0].source,
+  "LLM + política do service desk",
+);
 console.log(
   "API smoke: privacy, handoff, agent pause, claim, human reply, release, close and live progress passed.",
 );
