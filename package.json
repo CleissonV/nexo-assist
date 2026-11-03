@@ -1,1 +1,31 @@
-{"name":"nexo-assist","version":"1.0.0","private":true,"scripts":{"dev":"next dev --hostname 0.0.0.0","build":"next build","start":"next start --hostname 0.0.0.0","typecheck":"tsc --noEmit","test":"tsx --test tests/*.test.ts"},"dependencies":{"next":"16.4.4","react":"^19.2.0","react-dom":"^19.2.0","@langchain/langgraph":"^1.0.0","@langchain/openai":"^1.0.0","@libsql/client":"^0.17.0","zod":"^4.0.0","lucide-react":"^0.468.0"},"devDependencies":{"typescript":"^5.9.0","tsx":"^4.20.0","@types/node":"^24.0.0","@types/react":"^19.2.0","@types/react-dom":"^19.2.0"}}
+{
+  "name": "nexo-assist",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack --hostname 0.0.0.0",
+    "build": "next build --webpack",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "@langchain/langgraph": "^1.0.0",
+    "@langchain/openai": "^1.0.0",
+    "@libsql/client": "^0.17.0",
+    "lucide-react": "^0.468.0",
+    "next": "16.4.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  },
+  "type": "module"
+}
