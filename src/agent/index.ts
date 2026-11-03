@@ -13,6 +13,7 @@ import { listTickets, commitDraft } from "../services/tickets";
 import { articles } from "../lib/knowledge";
 import { priority, isOverdue, canReopen } from "../lib/policy";
 import { consumeLimit } from "../lib/limits";
+import { modelSettings } from "../lib/model";
 const schema = z.object({
   intent: z.enum([
     "help",
@@ -127,12 +128,13 @@ async function understand(state: typeof State.State) {
   let u = demo(text, c);
   if (c.pending || ["cancelar", "resolveu, obrigado"].includes(normalize(text)))
     return { understanding: u };
-  if (process.env.OPENAI_API_KEY) {
+  const settings = modelSettings();
+  if (settings) {
     try {
       await consumeLimit("llm-global", 200, 86400000);
       await consumeLimit(`llm:${c.owner}`, 60, 3600000);
       const model = new ChatOpenAI({
-        model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+        ...settings,
         temperature: 0,
         maxTokens: 600,
         timeout: 20000,
@@ -169,7 +171,7 @@ async function understand(state: typeof State.State) {
 }
 async function act(state: typeof State.State) {
   const { text, conversation: c, understanding: u } = state;
-  const source = process.env.OPENAI_API_KEY
+  const source = modelSettings()
     ? "LLM + política do service desk"
     : "Demonstração determinística";
   const trace: Trace[] = [

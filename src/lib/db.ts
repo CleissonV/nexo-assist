@@ -1,4 +1,4 @@
-import { createClient } from "@libsql/client";
+import { createDatabase } from "./database";
 import { randomUUID } from "node:crypto";
 import { employees, type Ticket, type Conversation } from "./types";
 import { deadline } from "./policy";
@@ -6,11 +6,11 @@ if (
   process.env.VERCEL &&
   (!process.env.DATABASE_URL || process.env.DATABASE_URL.startsWith("file:"))
 )
-  throw new Error("Configure um banco libsql persistente antes do deploy.");
-export const db = createClient({
-  url: process.env.DATABASE_URL || "file:nexo.db",
-  authToken: process.env.DATABASE_AUTH_TOKEN,
-});
+  throw new Error("Configure um banco persistente antes do deploy.");
+export const db = createDatabase(
+  process.env.DATABASE_URL || "file:nexo.db",
+  process.env.DATABASE_AUTH_TOKEN,
+);
 let initialized: Promise<void> | undefined;
 export function init() {
   return (initialized ??= setup());
@@ -97,7 +97,7 @@ async function setup() {
   ];
   await db.batch(
     seeds.map((t) => ({
-      sql: "INSERT OR IGNORE INTO tickets VALUES (?,?,?)",
+      sql: "INSERT INTO tickets VALUES (?,?,?) ON CONFLICT(id) DO NOTHING",
       args: [t.id, t.owner, JSON.stringify(t)],
     })),
     "write",

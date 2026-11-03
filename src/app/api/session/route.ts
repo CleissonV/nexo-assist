@@ -4,11 +4,12 @@ import { cookies } from "next/headers";
 import { db, init } from "@/lib/db";
 import { employees } from "@/lib/types";
 import { auth } from "@/lib/auth";
+import { modelSettings } from "@/lib/model";
 export async function GET() {
   try {
     return NextResponse.json({
       ...(await auth()),
-      mode: process.env.OPENAI_API_KEY ? "llm" : "demo",
+      mode: modelSettings() ? "llm" : "demo",
     });
   } catch {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });

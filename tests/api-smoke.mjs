@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-const base = "http://localhost:3000/api/";
+const base = (process.env.TEST_BASE_URL || "http://localhost:3000") + "/api/";
 async function login(email, password) {
   const r = await fetch(base + "session", {
     method: "POST",
@@ -19,7 +19,10 @@ async function api(path, cookie, body) {
 }
 const ana = await login("ana.silva@nexo.com", "teste");
 const bruno = await login("bruno.costa@nexo.com", "teste");
-const analyst = await login("analista@nexo.com", "nexo-demo");
+const analyst = await login(
+  "analista@nexo.com",
+  process.env.TEST_ANALYST_PASSWORD || "nexo-demo",
+);
 const { data: c } = await api("conversations", ana, {});
 const path = "conversations/" + c.id;
 assert.equal((await api(path, bruno)).status, 404);

@@ -1,6 +1,6 @@
 # Nexo Assist
 
-Service desk de TI conversacional para o desafio Beyond the Bytes. TypeScript estrito, Next.js, LangGraph.js e SQLite/libSQL. Interface baseada nas telas do protótipo Pencil: login em dois painéis, navegação lateral, chat com cartões e console de três colunas.
+Service desk de TI conversacional para o desafio Beyond the Bytes. TypeScript estrito, Next.js, LangGraph.js, SQLite/libSQL local e Neon Postgres no deploy Vercel. Interface baseada nas telas do protótipo Pencil: login em dois painéis, navegação lateral, chat com cartões e console de três colunas.
 
 ## Rodar localmente
 
@@ -25,6 +25,8 @@ Console: `analista@nexo.com`, senha local `nexo-demo`. Em produção, definir `A
 ## IA e modo demonstração
 
 Configure `OPENAI_API_KEY` em `.env.local` para ativar a interpretação pelo modelo. `OPENAI_MODEL` permite escolher o modelo; padrão `gpt-4.1-mini`, por suportar saída estruturada para extração de intenção e fatos. A escolha privilegia uma única extração curta por turno, em vez de um loop autônomo de ferramentas. Chaves são usadas apenas no servidor.
+
+Alternativa na Vercel: `AI_GATEWAY_ENABLED=true` usa o token OIDC de curta duração da plataforma; `AI_GATEWAY_MODEL=openai/gpt-4.1-mini`. A conta deve estar verificada e com acesso liberado ao Gateway. A autenticação foi testada, mas a conta retornou `customer_verification_required`; por isso a integração não é ativada silenciosamente. Localmente também é possível usar `AI_GATEWAY_API_KEY`.
 
 **Sem chave, a aplicação identifica claramente “Modo demonstração”.** Nesse modo o mesmo grafo LangGraph usa classificação determinística, suficiente para reproduzir os cenários de teste. Isso não substitui a avaliação com um LLM: a integração real depende de credenciais e não foi validada com um provedor nesta entrega inicial. Falha do provedor ou baixa confiança transferem para humano; não há execução silenciosa com uma decisão improvisada.
 
@@ -84,15 +86,15 @@ Cookie de sessão aleatório, HttpOnly, SameSite Strict, Secure em produção, v
 
 ## Deploy
 
-O backend não funciona em GitHub Pages, que hospeda arquivos estáticos. O repositório pode ser conectado à Vercel; para persistência externa, use um banco **libSQL** no Turso. A aplicação recusa banco local no ambiente Vercel, evitando uma demonstração que perde dados entre execuções.
+O backend não funciona em GitHub Pages, que hospeda arquivos estáticos. O projeto Vercel `nexo-assist` utiliza um banco Neon Postgres exclusivo, provisionado no plano gratuito, em São Paulo (`gru1`). A aplicação recusa banco local no ambiente Vercel, evitando perda de dados entre execuções. O adaptador usa consultas parametrizadas e transações HTTP no Neon; o modo local continua usando SQLite sem infraestrutura adicional.
 
-1. Crie banco libSQL no Turso (não o engine TursoDB), obtenha URL e token.
+1. Conecte um banco Neon pelo Marketplace da Vercel. A integração define `DATABASE_URL` automaticamente. Como alternativa, banco libSQL no Turso continua aceito com URL e token.
 2. Importe este repositório na Vercel, framework Next.js, Node.js 22 ou 24.
-3. Cadastre `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, `ANALYST_PASSWORD`, `OPENAI_API_KEY` e `OPENAI_MODEL` como variáveis do servidor.
+3. Cadastre `ANALYST_PASSWORD` e as variáveis de IA como segredos do servidor. `DATABASE_AUTH_TOKEN` só é necessário para libSQL; Neon usa a URL protegida fornecida pela integração.
 4. Execute deploy. Esquema e dados de exemplo são inicializados automaticamente sem sobrescrever dados existentes.
 5. Teste o roteiro acima no endereço publicado. Compartilhe senha do analista diretamente com os avaliadores, nunca no repositório público.
 
-**Estado atual:** deploy depende da configuração das credenciais do banco e do provedor de IA. Nenhum endereço de produção é anunciado antes dessa validação.
+**Estado atual:** banco Neon conectado e validado; deploy provisório em validação. IA real depende de chave de provedor ou verificação do AI Gateway. O modo demonstração é identificado e não deve ser confundido com conformidade completa ao requisito de LLM do PRD.
 
 Documentação: [LangGraph](https://docs.langchain.com/oss/javascript/langgraph/graph-api), [Turso](https://docs.turso.tech/quickstart), [OpenAI](https://developers.openai.com/api/docs/quickstart).
 
@@ -101,7 +103,7 @@ Documentação: [LangGraph](https://docs.langchain.com/oss/javascript/langgraph/
 - Duplicidade por termos significativos é conservadora e simples de inspecionar; pode encontrar falsos positivos. Um rascunho confirmado permite revisão humana. Com mais tempo: busca semântica com avaliação de pares de chamados.
 - A confiança do modelo é autodeclarada, não probabilidade calibrada. Com mais tempo: conjunto de avaliação versionado, avaliação com LLM real e limiar calibrado por intenção.
 - Respostas operacionais usam templates com fatos verificados; restringem criatividade para evitar inventar status, prazos ou instruções técnicas.
-- SQLite local reduz instalação; libSQL remoto serve ao deploy. Escrita do chamado e gravação da conversa ainda são operações distintas; próximo passo é outbox/transação de confirmação para tolerar interrupção exata entre as duas.
+- SQLite local reduz instalação; Neon Postgres serve ao deploy. Escrita do chamado e gravação da conversa ainda são operações distintas; o ID estável do rascunho impede duplicar uma criação ao repetir a confirmação após interrupção. Próximo passo: outbox/transação para atomicidade completa.
 - O limite de 30 turnos aplica-se ao agente; após transferência, o humano pode continuar atendendo. Controles por identidade de demonstração não equivalem a autenticação corporativa real.
 - Em produção real: SSO, RBAC por analista, auditoria separada imutável, calendário de feriados, idempotência ponta a ponta, retenção de dados, alertas e testes de carga.
 
