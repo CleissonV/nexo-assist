@@ -76,6 +76,8 @@ npm run build
 
 Avaliação opcional com um provedor real configurado em `.env.local`: `node --env-file=.env.local --import tsx tests/live-evaluation.ts`. Ela usa banco de teste separado e consome a cota do provedor. O teste integrado contra um servidor está em `tests/api-smoke.mjs`; configure `TEST_BASE_URL` e `TEST_ANALYST_PASSWORD` sem colocar a senha em argumentos de terminal.
 
+Na verificação desta entrega, o teste integrado público final passou, incluindo conteúdo de resposta do Gemini e cartão do chamado. A suíte ampliada com várias chamadas consecutivas apresentou timeouts do provedor em algumas execuções, inclusive na repetição final; ela **não é apresentada como integralmente aprovada**. O modelo gratuito é funcional, mas sua cota/capacidade pode reduzir a repetibilidade. O adaptador nativo limita cada tentativa a 20 segundos e repete uma vez apenas falhas temporárias; limite de cota e erros de validação não são repetidos. Após falha, o agente encaminha ao analista com contexto e sem executar gravação não confirmada.
+
 Testes exercitam classificação por impacto/urgência, fim de semana, fronteira de sete dias, isolamento por proprietário, tentativa de atualização indevida, confirmação sem duplicação, reabertura, transferência crítica/vencida/incerta, persistência do estado, aplicabilidade do artigo VPN e retries. Os testes usam banco separado em `work/`.
 
 Roteiro manual:
