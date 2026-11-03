@@ -132,6 +132,37 @@ const State = Annotation.Root({
 async function understand(state: typeof State.State) {
   const { text, conversation: c } = state;
   let u = demo(text, c);
+  if (
+    !c.pending &&
+    !c.facts.updating &&
+    u.ticketId &&
+    !/complement|atualiz|reabrir/i.test(text)
+  )
+    return {
+      understanding: {
+        ...u,
+        intent: "consult" as const,
+        confidence: 1,
+        source: "policy" as const,
+        reason:
+          "Identificador de chamado explícito: consulta direta, sem gastar uma chamada de modelo.",
+      },
+    };
+  if (
+    /^(falar|quero falar|chamar) (com )?(um )?(analista|atendente|humano)[.!?]?$/i.test(
+      text.trim(),
+    )
+  )
+    return {
+      understanding: {
+        ...u,
+        intent: "human" as const,
+        confidence: 1,
+        source: "policy" as const,
+        reason:
+          "Pedido explícito de atendimento humano; transferência imediata sem consulta ao modelo.",
+      },
+    };
   if (c.pending || ["cancelar", "resolveu, obrigado"].includes(normalize(text)))
     return {
       understanding: {

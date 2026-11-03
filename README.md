@@ -55,6 +55,8 @@ O cliente faz polling de 3,5 segundos para receber mensagens do analista e alter
 ### Como o agente decide
 
 1. Extrai intenção, categoria, impacto, urgência, sistema e identificador explicitamente informados. Usa até oito mensagens recentes e fatos persistidos.
+
+Consultas com identificador explícito, comandos de confirmação e pedidos explícitos de atendimento humano são resolvidos diretamente pela política, sem chamada de LLM. O histórico identifica essas ações como “Política determinística”. O modelo é usado para interpretar linguagem livre e preencher fatos de triagem; isso evita custo e latência em operações que não exigem interpretação semântica.
 2. Redireciona assuntos fora de TI. Pedido humano, confiança inferior a 70%, incidente crítico ou chamado vencido transferem com resumo.
 3. Consulta somente chamados do funcionário autenticado. Artigos têm identificador de fonte; o erro VPN 809 exige verificar a versão do Windows.
 4. Pergunta quem é afetado e qual a urgência. A matriz determina a prioridade; o modelo não pode sobrescrevê-la.

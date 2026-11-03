@@ -18,7 +18,7 @@ async function turn(c: Conversation, text: string) {
   c.messages.push(m);
   assert.equal(
     m.trace?.[0].source,
-    text === "Confirmar"
+    text === "Confirmar" || /INC-20400/.test(text)
       ? "Política determinística"
       : "LLM + política do service desk",
   );
