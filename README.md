@@ -24,6 +24,10 @@ Console: `analista@nexo.com`, senha local `nexo-demo`. Em produção, definir `A
 
 ## IA e modo demonstração
 
+**Opção sem compra de créditos:** configure `GEMINI_API_KEY` no arquivo `.env.local`, usando uma chave de projeto Google AI Studio na faixa gratuita. O modelo padrão é `gemini-3.1-flash-lite`, configurável por `GEMINI_MODEL`. O adaptador usa o endpoint de compatibilidade oficial do Gemini, sem alterar o grafo ou as regras. A faixa gratuita tem limites e pode ser insuficiente para alto volume; sua disponibilidade depende da conta. Não ative faturamento para testar sem custos. [Preços](https://ai.google.dev/gemini-api/docs/pricing) e [compatibilidade oficial](https://ai.google.dev/gemini-api/docs/openai).
+
+Ordem de seleção de credenciais: Gemini, OpenAI e Gateway explicitamente habilitado. Apenas o provedor selecionado recebe as mensagens.
+
 Configure `OPENAI_API_KEY` em `.env.local` para ativar a interpretação pelo modelo. `OPENAI_MODEL` permite escolher o modelo; padrão `gpt-4.1-mini`, por suportar saída estruturada para extração de intenção e fatos. A escolha privilegia uma única extração curta por turno, em vez de um loop autônomo de ferramentas. Chaves são usadas apenas no servidor.
 
 Alternativa na Vercel: `AI_GATEWAY_ENABLED=true` usa o token OIDC de curta duração da plataforma; `AI_GATEWAY_MODEL=openai/gpt-4.1-mini`. A conta deve estar verificada e com acesso liberado ao Gateway. A autenticação foi testada, mas a conta retornou `customer_verification_required`; por isso a integração não é ativada silenciosamente. Localmente também é possível usar `AI_GATEWAY_API_KEY`.

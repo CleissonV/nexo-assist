@@ -1,4 +1,12 @@
 export function modelSettings() {
+  if (process.env.GEMINI_API_KEY)
+    return {
+      apiKey: process.env.GEMINI_API_KEY,
+      model: process.env.GEMINI_MODEL || "gemini-3.1-flash-lite",
+      configuration: {
+        baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+      },
+    };
   if (process.env.OPENAI_API_KEY)
     return {
       apiKey: process.env.OPENAI_API_KEY,
